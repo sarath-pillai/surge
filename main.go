@@ -10,7 +10,10 @@ import (
 
 func main() {
 	url := flag.String("u", "", "url")
-	concurrency := flag.Int("c", 100, "concurrency")
+	concurrency := flag.Int("c", 1, "concurrency")
+	body := flag.String("b", "", "body")
+	method := flag.String("m", "GET", "method")
+	contentType := flag.String("ct", "", "contentType")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of Surge:\n surge -u 'https://www.google.com,https://www.example.com'\n")
 	}
@@ -23,7 +26,12 @@ func main() {
 	ch := make(chan string)
 	for _, u := range urls {
 		for range *concurrency {
-			go fetch.Fetch(u, ch)
+			if *method == "GET" {
+				go fetch.Fetch_get(u, ch)
+			}
+			if *method == "POST" {
+				go fetch.Fetch_post(u, ch, *method, *contentType, *body)
+			}
 		}
 	}
 	for range urls {
