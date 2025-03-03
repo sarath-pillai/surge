@@ -11,38 +11,51 @@ import (
 )
 
 func Fetch_post(u string, ch chan<- string, m string, ct string, b string) {
-	start := time.Now()
+	client := &http.Client{
+		Transport: &http.Transport{},
+	}
 	if b == "" {
-		resp, err := http.Post(u, ct, nil)
+		req, err := http.NewRequest(m, u, nil)
 		if err != nil {
 			ch <- fmt.Sprintf("%v", err)
 		}
-		nbytes, err := io.Copy(ioutil.Discard, resp.Body)
+		req.Header.Set("Content-Type", ct)
+		start := time.Now()
+		response, err := client.Do(req)
+		if err != nil {
+			ch <- fmt.Sprintf("Error: %v", err)
+
+		}
 		elapsed := time.Since(start).Seconds()
-		resp.Body.Close()
+		nbytes, err := io.Copy(ioutil.Discard, response.Body)
 		if err != nil {
-			ch <- fmt.Sprintf("%v", err)
-			os.Exit(1)
+			ch <- fmt.Sprintf("Error: %v", err)
 		}
-		ch <- fmt.Sprintf("%.2fs	%7d		%s		%d", elapsed, nbytes, u, resp.StatusCode)
+		defer response.Body.Close()
+		ch <- fmt.Sprintf("%.2fs	%7d	%s	%d", elapsed, nbytes, u, response.StatusCode)
 	} else {
 		data, err := os.Open(b)
 		if err != nil {
-			ch <- fmt.Sprintf("%v", err)
+			ch <- fmt.Sprintf("Error: %v", err)
 			log.Fatal(err)
 		}
-		resp, err := http.Post(u, ct, data)
+		req, err := http.NewRequest(m, u, data)
 		if err != nil {
-			ch <- fmt.Sprintf("%v", err)
+			ch <- fmt.Sprintf("Error: %v", err)
 		}
-		nbytes, err := io.Copy(ioutil.Discard, resp.Body)
+		req.Header.Set("Content-Type", ct)
+		start := time.Now()
+		response, err := client.Do(req)
+		if err != nil {
+			ch <- fmt.Sprintf("Error:- %v", err)
+		}
 		elapsed := time.Since(start).Seconds()
-		resp.Body.Close()
+		nbytes, err := io.Copy(ioutil.Discard, response.Body)
 		if err != nil {
-			ch <- fmt.Sprintf("%v", err)
-			os.Exit(1)
+			ch <- fmt.Sprintf("Error: %v", err)
 		}
-		ch <- fmt.Sprintf("%.2fs	%7d		%s	%d", elapsed, nbytes, u, resp.StatusCode)
+		defer response.Body.Close()
+		ch <- fmt.Sprintf("%.2fs	%7d	%s	%d", elapsed, nbytes, u, response.StatusCode)
 	}
 }
 
