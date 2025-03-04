@@ -8,6 +8,17 @@ import (
 	"surge/fetch"
 )
 
+type headers []string
+
+func (h *headers) String() string {
+	return fmt.Sprintf("%s", *h)
+}
+
+func (h *headers) Set(value string) error {
+	*h = append(*h, value)
+	return nil
+}
+
 func isFlagPassed(name string) bool {
 	found := false
 	flag.Visit(func(f *flag.Flag) {
@@ -24,11 +35,13 @@ func main() {
 	body := flag.String("b", "", "body")
 	method := flag.String("m", "GET", "method")
 	contentType := flag.String("ct", "", "contentType")
+	var h headers
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of Surge:\n surge -u 'https://www.google.com,https://www.example.com'\n")
 	}
+	flag.Var(&h, "header", "Header Name and Value")
 	flag.Parse()
-	if isFlagPassed("u") == false {
+	if !isFlagPassed("u") {
 		fmt.Println("At least One URL needs to be passed. Use -u to pass one")
 		os.Exit(1)
 	}
@@ -40,7 +53,7 @@ func main() {
 				go fetch.Fetch_get(u, ch)
 			}
 			if *method == "POST" {
-				go fetch.Fetch_post(u, ch, *method, *contentType, *body)
+				go fetch.Fetch_post(u, ch, *method, *contentType, *body, h)
 			}
 		}
 	}

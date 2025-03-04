@@ -7,10 +7,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
-func Fetch_post(u string, ch chan<- string, m string, ct string, b string) {
+func Fetch_post(u string, ch chan<- string, m string, ct string, b string, h []string) {
 	client := &http.Client{
 		Transport: &http.Transport{},
 	}
@@ -20,6 +21,12 @@ func Fetch_post(u string, ch chan<- string, m string, ct string, b string) {
 			ch <- fmt.Sprintf("%v", err)
 		}
 		req.Header.Set("Content-Type", ct)
+		if len(h) > 0 {
+			for _, v := range h {
+				pairs := strings.Split(v, ":")
+				req.Header.Set("pairs[0]", pairs[1])
+			}
+		}
 		start := time.Now()
 		response, err := client.Do(req)
 		if err != nil {
@@ -44,6 +51,12 @@ func Fetch_post(u string, ch chan<- string, m string, ct string, b string) {
 			ch <- fmt.Sprintf("Error: %v", err)
 		}
 		req.Header.Set("Content-Type", ct)
+		if len(h) > 0 {
+			for _, v := range h {
+				pairs := strings.Split(v, ":")
+				req.Header.Set("pairs[0]", pairs[1])
+			}
+		}
 		start := time.Now()
 		response, err := client.Do(req)
 		if err != nil {
