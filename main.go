@@ -28,11 +28,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage of Surge:\n surge -u 'https://www.google.com,https://www.example.com'\n")
 	}
 	flag.Parse()
-	urls := strings.Split(*url, ",")
-	if !isFlagPassed(*url) {
+	if isFlagPassed("u") == false {
 		fmt.Println("At least One URL needs to be passed. Use -u to pass one")
 		os.Exit(1)
 	}
+	urls := strings.Split(*url, ",")
 	ch := make(chan string)
 	for _, u := range urls {
 		for range *concurrency {
