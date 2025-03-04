@@ -8,6 +8,16 @@ import (
 	"surge/fetch"
 )
 
+func isFlagPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
+}
+
 func main() {
 	url := flag.String("u", "", "url")
 	concurrency := flag.Int("c", 1, "concurrency")
@@ -19,8 +29,8 @@ func main() {
 	}
 	flag.Parse()
 	urls := strings.Split(*url, ",")
-	if len(urls) < 1 {
-		fmt.Println("At least provide one Host/URL to fetch")
+	if !isFlagPassed(*url) {
+		fmt.Println("At least One URL needs to be passed. Use -u to pass one")
 		os.Exit(1)
 	}
 	ch := make(chan string)
