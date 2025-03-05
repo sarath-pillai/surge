@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"surge/fetch"
+	"surge/reports"
 )
 
 type headers []string
@@ -49,6 +50,7 @@ func main() {
 	}
 	urls := strings.Split(*url, ",")
 	ch := make(chan string)
+	fmt.Printf("Running Performance test against %v with concurrency of %d\n", *url, *concurrency)
 	for _, u := range urls {
 		for range *concurrency {
 			if *method == "GET" {
@@ -59,9 +61,15 @@ func main() {
 			}
 		}
 	}
+	var results []string
 	for range urls {
 		for range *concurrency {
-			fmt.Println(<-ch)
+			results = append(results, <-ch)
 		}
+	}
+	min, max, not_ok_status := reports.Stats(results)
+	fmt.Printf("Lowest Response Time: %.2fs\nHighest Response Time: %.2fs\nResponses Other than 200: %d\n", min, max, not_ok_status)
+	for _, r := range results {
+		fmt.Println(r)
 	}
 }
