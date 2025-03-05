@@ -32,12 +32,14 @@ func isFlagPassed(name string) bool {
 func main() {
 	url := flag.String("u", "", "url")
 	concurrency := flag.Int("c", 1, "concurrency")
-	body := flag.String("b", "", "body")
-	method := flag.String("m", "GET", "method")
+	body := flag.String("b", "", "HTTP body")
+	method := flag.String("m", "GET", "HTTP method")
 	contentType := flag.String("ct", "", "contentType")
+	authentication := flag.String("a", "", "Basic authentication in the format username:password")
 	var h headers
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of Surge:\n surge -u 'https://www.google.com,https://www.example.com'\n")
+		flag.PrintDefaults()
 	}
 	flag.Var(&h, "header", "Header Name and Value")
 	flag.Parse()
@@ -50,10 +52,10 @@ func main() {
 	for _, u := range urls {
 		for range *concurrency {
 			if *method == "GET" {
-				go fetch.Fetch_get(u, ch)
+				go fetch.Fetch_get(u, ch, *method, h, *authentication)
 			}
 			if *method == "POST" {
-				go fetch.Fetch_post(u, ch, *method, *contentType, *body, h)
+				go fetch.Fetch_post(u, ch, *method, *contentType, *body, h, *authentication)
 			}
 		}
 	}
