@@ -1,6 +1,6 @@
 # Surge : Minimal HTTP Performance Testing Tool
 
-Surge is a quick way to benchmark your HTTP URLs. It uses goroutines to initate concurrent requests for a set duration and reports back details like response time(Highest, Lowest), and status codes. Its a pretty light weight and minimal one that performs a quick concurrent test against a given endpoint. 
+Surge is a quick way to benchmark your HTTP endpoints. It uses goroutines to initate concurrent requests for a set duration and reports back details like response time(Highest, Lowest), and status codes. Its a pretty light weight and minimal one that performs a quick concurrent test against a given endpoint. 
 
 ## Basic Usage
 
@@ -34,7 +34,7 @@ Responses Other than 200: 0
 0.06s      1256 200
 ```
 
-## Surge command line parameters
+## Command line parameters
 
 | Parameter     | Description                        |
 |---------------|-----------------------------------|
@@ -43,7 +43,7 @@ Responses Other than 200: 0
 | `-d`          | Duration of the test in seconds   |
 | `-m`          | HTTP method (GET or POST)         |
 | `-b`          | HTTP body (for POST requests). Its a full file path with body data     |
-| `-d`          | Duration for how long the test should run. Default is 60 seconds (default 5)     |
+| `-d`          | Duration for how long the test should run (default 5)     |
 | `--header`          | Header Name and Value in the format headerName:headerValue. You can pass multiple using --header multiple times     |
 | `-a`          | Basic HTTP Auth. "username:password"   |
 
@@ -60,7 +60,7 @@ Usage of Surge:
   -ct string
         contentType
   -d int
-        Duration for how long the test should run. Default is 60 seconds (default 5)
+        Duration for how long the test should run (default 5)
   -header value
         Header Name and Value
   -m string
