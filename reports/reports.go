@@ -17,7 +17,7 @@ func Stats(results []string) (float64, float64, int) {
 	for _, r := range results {
 		fields := strings.Fields(r)
 		responses = append(responses, fields[0])
-		statuscodes = append(statuscodes, fields[3])
+		statuscodes = append(statuscodes, fields[2])
 	}
 
 	min, _ := strconv.ParseFloat(strings.TrimSuffix(responses[0], "s"), 64)

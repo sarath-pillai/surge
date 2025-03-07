@@ -7,6 +7,8 @@ import (
 	"strings"
 	"surge/fetch"
 	"surge/reports"
+	"surge/timer"
+	"time"
 )
 
 type headers []string
@@ -31,10 +33,11 @@ func isFlagPassed(name string) bool {
 }
 
 func main() {
-	url := flag.String("u", "", "url")
-	concurrency := flag.Int("c", 1, "concurrency")
-	body := flag.String("b", "", "HTTP body")
-	method := flag.String("m", "GET", "HTTP method")
+	url := flag.String("u", "", "The endpoint IP, URL against which the test needs to be performed")
+	concurrency := flag.Int("c", 1, "How many Concurrent requests should be sent")
+	body := flag.String("b", "", "HTTP body. This is a file containing the data that needs to be sent")
+	method := flag.String("m", "GET", "HTTP method. Currently GET & POST is supported")
+	duration := flag.Int("d", 60, "Duration for how long the test should run. Default is 60 seconds")
 	contentType := flag.String("ct", "", "contentType")
 	authentication := flag.String("a", "", "Basic authentication in the format username:password")
 	var h headers
@@ -48,23 +51,19 @@ func main() {
 		fmt.Println("At least One URL needs to be passed. Use -u to pass one")
 		os.Exit(1)
 	}
+	var results []string
 	urls := strings.Split(*url, ",")
-	ch := make(chan string)
 	fmt.Printf("Running Performance test against %v with concurrency of %d\n", *url, *concurrency)
 	for _, u := range urls {
-		for range *concurrency {
-			if *method == "GET" {
-				go fetch.Fetch_get(u, ch, *method, h, *authentication)
-			}
-			if *method == "POST" {
-				go fetch.Fetch_post(u, ch, *method, *contentType, *body, h, *authentication)
-			}
+		if *method == "GET" {
+			results = timer.ExecuteForDuration(func() []string {
+				return fetch.Fetch_get(u, *method, h, *authentication, *concurrency)
+			}, time.Duration(*duration)*time.Second)
 		}
-	}
-	var results []string
-	for range urls {
-		for range *concurrency {
-			results = append(results, <-ch)
+		if *method == "POST" {
+			results = timer.ExecuteForDuration(func() []string {
+				return fetch.Fetch_post(u, *method, *contentType, *body, h, *authentication, *concurrency)
+			}, time.Duration(*duration)*time.Second)
 		}
 	}
 	min, max, not_ok_status := reports.Stats(results)
