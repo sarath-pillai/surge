@@ -37,12 +37,12 @@ func main() {
 	concurrency := flag.Int("c", 1, "How many Concurrent requests should be sent")
 	body := flag.String("b", "", "HTTP body. This is a file containing the data that needs to be sent")
 	method := flag.String("m", "GET", "HTTP method. Currently GET & POST is supported")
-	duration := flag.Int("d", 60, "Duration for how long the test should run. Default is 60 seconds")
+	duration := flag.Int("d", 5, "Duration for how long the test should run. Default is 60 seconds")
 	contentType := flag.String("ct", "", "contentType")
 	authentication := flag.String("a", "", "Basic authentication in the format username:password")
 	var h headers
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of Surge:\n surge -u 'https://www.google.com,https://www.example.com'\n")
+		fmt.Fprintf(os.Stderr, "Usage of Surge:\n surge -u 'https://www.example.com'\n")
 		flag.PrintDefaults()
 	}
 	flag.Var(&h, "header", "Header Name and Value")
@@ -53,7 +53,7 @@ func main() {
 	}
 	var results []string
 	urls := strings.Split(*url, ",")
-	fmt.Printf("Running Performance test against %v with concurrency of %d\n", *url, *concurrency)
+	fmt.Printf("Running Performance test against %v with concurrency of %d, for a duration of %d seconds\n", *url, *concurrency, *duration)
 	for _, u := range urls {
 		if *method == "GET" {
 			results = timer.ExecuteForDuration(func() []string {
