@@ -39,7 +39,10 @@ func main() {
 	method := flag.String("m", "GET", "HTTP method. Currently GET & POST is supported")
 	duration := flag.Int("d", 5, "Duration for how long the test should run. Default is 5 seconds")
 	contentType := flag.String("ct", "", "contentType")
+	consoleOut := flag.Bool("o", false, "Should output be displayed on the console")
 	authentication := flag.String("a", "", "Basic authentication in the format username:password")
+	reportGeneration := flag.Bool("r", false, "Should CSV report be generated")
+	reportFileName := flag.String("f", "", "CSV File name(if not provided it will create a surge-timestamped file)")
 	var h headers
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of Surge:\n surge -u 'https://www.example.com'\n")
@@ -68,7 +71,13 @@ func main() {
 	}
 	min, max, not_ok_status := reports.Stats(results)
 	fmt.Printf("Lowest Response Time: %.2fs\nHighest Response Time: %.2fs\nResponses Other than 200: %d\n", min, max, not_ok_status)
-	for _, r := range results {
-		fmt.Println(r)
+	if *consoleOut {
+		for _, r := range results {
+			fmt.Println(r)
+		}
 	}
+	if *reportGeneration {
+		reports.GenerateCSV(*reportFileName, results)
+	}
+
 }

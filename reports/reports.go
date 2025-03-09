@@ -1,10 +1,12 @@
 package reports
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func Stats(results []string) (float64, float64, int) {
@@ -44,4 +46,30 @@ func Stats(results []string) (float64, float64, int) {
 		}
 	}
 	return min, max, len(not_ok_status)
+}
+
+func GenerateCSV(filename string, data []string) {
+	if filename == "" {
+		filename = "surge-" + strconv.FormatInt(time.Now().Unix(), 10) + ".csv"
+	} else {
+		filename = filename
+	}
+	file, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+	header := []string{"ResponseTime", "ResponseBytes", "HTTPStatusCode"}
+	if err := writer.Write(header); err != nil {
+		panic(err)
+	}
+	for _, row := range data {
+		fields := strings.Fields(row)
+		if err := writer.Write(fields); err != nil {
+			panic(err)
+		}
+	}
+	fmt.Printf("CSV report is in the file %s\n", filename)
 }

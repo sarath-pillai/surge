@@ -34,6 +34,16 @@ Responses Other than 200: 0
 0.06s      1256 200
 ```
 
+## Generate CSV report of the test(includes all requests that were sent)
+```bash
+sh-3.2$ go run main.go -u https://www.example.com -c 5 -d 3 -r true
+Running Performance test against https://www.example.com with concurrency of 5, for a duration of 3 seconds
+Execution duration complete
+Lowest Response Time: 0.07s
+Highest Response Time: 0.08s
+Responses Other than 200: 0
+CSV report is in the file surge-1741498636.csv
+```
 ## Command line parameters
 
 | Parameter     | Description                        |
