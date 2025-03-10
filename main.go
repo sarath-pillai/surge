@@ -70,7 +70,16 @@ func main() {
 		}
 	}
 	min, max, not_ok_status := reports.Stats(results)
-	fmt.Printf("Lowest Response Time: %.2fs\nHighest Response Time: %.2fs\nResponses Other than 200: %d\n", min, max, not_ok_status)
+	output := fmt.Sprintf(
+		"Lowest Response Time: %.2fs\n"+
+			"Highest Response Time: %.2fs\n"+
+			"Responses Other than 200: %d\n"+
+			"Total Number of Requests: %d\n"+
+			"Requests Per Second: %d\n",
+		min, max, not_ok_status, len(results),
+		len(results) / *duration, // Safe only if duration is not nil
+	)
+	fmt.Print(output)
 	if *consoleOut {
 		for _, r := range results {
 			fmt.Println(r)
